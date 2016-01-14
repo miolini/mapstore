@@ -7,22 +7,36 @@ import (
 	"testing"
 )
 
-func BenchmarkRead50Write50(b *testing.B) {
-	keys := make([]string, 10000)
+func BenchmarkShard1Read4Write4(b *testing.B)    { bench(1, 4, 4, 1000000, b) }
+func BenchmarkShard10Read4Write4(b *testing.B)   { bench(10, 4, 4, 1000000, b) }
+func BenchmarkShard100Read4Write4(b *testing.B)  { bench(100, 4, 4, 1000000, b) }
+func BenchmarkShard1000Read4Write4(b *testing.B) { bench(1000, 4, 4, 1000000, b) }
+func BenchmarkShard1Read8Write2(b *testing.B)    { bench(1, 8, 4, 1000000, b) }
+func BenchmarkShard10Read8Write2(b *testing.B)   { bench(10, 8, 4, 1000000, b) }
+func BenchmarkShard100Read8Write2(b *testing.B)  { bench(100, 8, 4, 1000000, b) }
+func BenchmarkShard1000Read8Write2(b *testing.B) { bench(1000, 8, 4, 1000000, b) }
+
+func genKeys(count int) []string {
+	keys := make([]string, count)
 	for i := 0; i < len(keys); i++ {
 		keys[i] = fmt.Sprintf("%d", i)
 	}
-	store := NewWithSize(4)
+	return keys
+}
+
+func bench(shards, readThreads, writeThreads int, keysCount int, b *testing.B) {
+	keys := genKeys(keysCount)
+	store := NewWithSize(shards)
 	wg := sync.WaitGroup{}
 	b.ResetTimer()
-	threads := 4
-	wg.Add(threads * 2)
-	for i := 0; i < threads; i++ {
+	wg.Add(readThreads + writeThreads)
+	for i := 0; i < writeThreads; i++ {
 		go testWrites(store, keys, b.N, &wg)
+	}
+	for i := 0; i < readThreads; i++ {
 		go testReads(store, keys, b.N, &wg)
 	}
 	wg.Wait()
-	b.Logf("stat: %v", store.ShardStats())
 }
 
 func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
