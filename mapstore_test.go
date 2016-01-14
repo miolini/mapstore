@@ -27,7 +27,7 @@ func BenchmarkShard1000Read8Write0(b *testing.B) { bench(1000, 8, 0, 1000000, b)
 func TestShardsStat(t *testing.T) {
 	keys := genKeys(1e6)
 	shards := 4
-	store := NewWithSize(shards)
+	store := New(shards)
 	for i := 0; i < 1e7; i++ {
 		key := keys[i%len(keys)]
 		store.Set(key, key)
@@ -45,7 +45,7 @@ func genKeys(count int) []string {
 
 func bench(shards, readThreads, writeThreads int, keysCount int, b *testing.B) {
 	keys := genKeys(keysCount)
-	store := NewWithSize(shards)
+	store := New(shards)
 	wg := sync.WaitGroup{}
 	b.ResetTimer()
 	wg.Add(readThreads + writeThreads)
@@ -58,7 +58,7 @@ func bench(shards, readThreads, writeThreads int, keysCount int, b *testing.B) {
 	wg.Wait()
 }
 
-func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
+func testWrites(s Store, keys []string, num int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	lenKeys := len(keys)
 	for i := 0; i < num; i++ {
@@ -67,7 +67,7 @@ func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
 	}
 }
 
-func testReads(s *Store, keys []string, num int, wg *sync.WaitGroup) {
+func testReads(s Store, keys []string, num int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	lenKeys := len(keys)
 	for i := 0; i < num; i++ {
