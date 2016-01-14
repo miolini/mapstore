@@ -1,6 +1,8 @@
 # mapstore
 Multicore optimized in-memory data store in Go
 
+[![Build Status](https://travis-ci.org/miolini/mapstore.svg)](https://travis-ci.org/miolini/mapstore.svg) [![Go Report Card](http://goreportcard.com/badge/miolini/mapstore)](http://goreportcard.com/report/miolini/mapstore)
+
 ## Benchmark
 
 ```bash
