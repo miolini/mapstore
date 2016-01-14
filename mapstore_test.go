@@ -19,6 +19,10 @@ func BenchmarkShard1Read2Write8(b *testing.B)    { bench(1, 2, 8, 1000000, b) }
 func BenchmarkShard10Read2Write8(b *testing.B)   { bench(10, 2, 8, 1000000, b) }
 func BenchmarkShard100Read2Write8(b *testing.B)  { bench(100, 2, 8, 1000000, b) }
 func BenchmarkShard1000Read2Write8(b *testing.B) { bench(1000, 2, 8, 1000000, b) }
+func BenchmarkShard1Read8Write0(b *testing.B)    { bench(1, 8, 0, 1000000, b) }
+func BenchmarkShard10Read8Write0(b *testing.B)   { bench(10, 8, 0, 1000000, b) }
+func BenchmarkShard100Read8Write0(b *testing.B)  { bench(100, 8, 0, 1000000, b) }
+func BenchmarkShard1000Read8Write0(b *testing.B) { bench(1000, 8, 0, 1000000, b) }
 
 func TestShardsStat(t *testing.T) {
 	keys := genKeys(1e6)
