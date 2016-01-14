@@ -14,10 +14,13 @@ func BenchmarkRead50Write50(b *testing.B) {
 	}
 	store := NewWithSize(4)
 	wg := sync.WaitGroup{}
-	wg.Add(2)
 	b.ResetTimer()
-	go testWrites(store, keys, b.N, &wg)
-	go testReads(store, keys, b.N, &wg)
+	threads := 4
+	wg.Add(threads * 2)
+	for i := 0; i < threads; i++ {
+		go testWrites(store, keys, b.N, &wg)
+		go testReads(store, keys, b.N, &wg)
+	}
 	wg.Wait()
 	b.Logf("stat: %v", store.ShardStats())
 }
