@@ -53,3 +53,14 @@ func (s *Store) Get(key string, defaultValue interface{}) (interface{}, bool) {
 	}
 	return result, ok
 }
+
+func (s *Store) ShardStats() []int {
+	result := make([]int, shards)
+	for i:=0;i<shards;i++ {
+		shard := s.shards[i]
+		shard.mutex.RLock()
+		result[i] = len(shard.data)
+		shard.mutex.RUnlock()
+	}
+	return result
+}

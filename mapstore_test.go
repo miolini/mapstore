@@ -19,6 +19,7 @@ func BenchmarkRead50Write50(b *testing.B) {
 	go testWrites(store, keys, b.N, &wg)
 	go testReads(store, keys, b.N, &wg)
 	wg.Wait()
+	b.Logf("stat: %v", store.ShardStats())
 }
 
 func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
