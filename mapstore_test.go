@@ -11,10 +11,25 @@ func BenchmarkShard1Read4Write4(b *testing.B)    { bench(1, 4, 4, 1000000, b) }
 func BenchmarkShard10Read4Write4(b *testing.B)   { bench(10, 4, 4, 1000000, b) }
 func BenchmarkShard100Read4Write4(b *testing.B)  { bench(100, 4, 4, 1000000, b) }
 func BenchmarkShard1000Read4Write4(b *testing.B) { bench(1000, 4, 4, 1000000, b) }
-func BenchmarkShard1Read8Write2(b *testing.B)    { bench(1, 8, 4, 1000000, b) }
-func BenchmarkShard10Read8Write2(b *testing.B)   { bench(10, 8, 4, 1000000, b) }
-func BenchmarkShard100Read8Write2(b *testing.B)  { bench(100, 8, 4, 1000000, b) }
-func BenchmarkShard1000Read8Write2(b *testing.B) { bench(1000, 8, 4, 1000000, b) }
+func BenchmarkShard1Read8Write2(b *testing.B)    { bench(1, 8, 2, 1000000, b) }
+func BenchmarkShard10Read8Write2(b *testing.B)   { bench(10, 8, 2, 1000000, b) }
+func BenchmarkShard100Read8Write2(b *testing.B)  { bench(100, 8, 2, 1000000, b) }
+func BenchmarkShard1000Read8Write2(b *testing.B) { bench(1000, 8, 2, 1000000, b) }
+func BenchmarkShard1Read2Write8(b *testing.B)    { bench(1, 2, 8, 1000000, b) }
+func BenchmarkShard10Read2Write8(b *testing.B)   { bench(10, 2, 8, 1000000, b) }
+func BenchmarkShard100Read2Write8(b *testing.B)  { bench(100, 2, 8, 1000000, b) }
+func BenchmarkShard1000Read2Write8(b *testing.B) { bench(1000, 2, 8, 1000000, b) }
+
+func TestShardsStat(t *testing.T) {
+	keys := genKeys(1e6)
+	shards := 4
+	store := NewWithSize(shards)
+	for i := 0; i < 1e7; i++ {
+		key := keys[i%len(keys)]
+		store.Set(key, key)
+	}
+	t.Logf("stats: %v", store.ShardStats())
+}
 
 func genKeys(count int) []string {
 	keys := make([]string, count)
