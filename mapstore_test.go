@@ -12,7 +12,7 @@ func BenchmarkRead50Write50(b *testing.B) {
 	for i := 0; i < len(keys); i++ {
 		keys[i] = fmt.Sprintf("%d", i)
 	}
-	store := New()
+	store := NewWithSize(4)
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 	b.ResetTimer()

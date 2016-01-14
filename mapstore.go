@@ -21,15 +21,18 @@ func newShard() *_shard {
 type Store struct {
 	shards      []*_shard
 	shardsCount int
+	mutex       sync.RWMutex
 }
 
 func NewWithSize(shardsCount int) *Store {
 	s := new(Store)
+	s.mutex.Lock()
 	s.shardsCount = shardsCount
 	s.shards = make([]*_shard, s.shardsCount)
 	for i := 0; i < shardsCount; i++ {
 		s.shards[i] = newShard()
 	}
+	s.mutex.Unlock()
 	return s
 }
 
@@ -38,8 +41,11 @@ func New() *Store {
 }
 
 func (s *Store) getShard(key string) *_shard {
-	num := int(murmur3.Sum64([]byte(key)) >> 1) % s.shardsCount
-	return s.shards[num]
+	s.mutex.RLock()
+	num := int(murmur3.Sum64([]byte(key))>>1) % s.shardsCount
+	shard := s.shards[num]
+	s.mutex.RUnlock()
+	return shard
 }
 
 func (s *Store) Set(key string, value interface{}) {
@@ -69,4 +75,28 @@ func (s *Store) ShardStats() []int {
 		shard.mutex.RUnlock()
 	}
 	return result
+}
+
+type Entry struct {
+	Key   string
+	Value interface{}
+}
+
+func (s *Store) Load(entries chan Entry) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	for entry := range entries {
+		shard := s.getShard(entry.Key)
+		shard.data[entry.Key] = entry.Value
+	}
+}
+
+func (s *Store) Save(entries chan<- Entry) {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	for _, shard := range s.shards {
+		for key, value := range shard.data {
+			entries <- Entry{key, value}
+		}
+	}
 }
