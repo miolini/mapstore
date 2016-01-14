@@ -1,15 +1,15 @@
 package mapstore
 
 import (
-	"testing"
-	"sync"
 	"fmt"
 	"math/rand"
+	"sync"
+	"testing"
 )
 
 func BenchmarkRead50Write50(b *testing.B) {
 	keys := make([]string, 10000)
-	for i:=0;i<len(keys);i++ {
+	for i := 0; i < len(keys); i++ {
 		keys[i] = fmt.Sprintf("%d", i)
 	}
 	store := New()
@@ -25,8 +25,8 @@ func BenchmarkRead50Write50(b *testing.B) {
 func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	lenKeys := len(keys)
-	for i:=0;i<num;i++ {
-		key := keys[rand.Int() % lenKeys]
+	for i := 0; i < num; i++ {
+		key := keys[rand.Int()%lenKeys]
 		s.Set(key, key)
 	}
 }
@@ -34,8 +34,8 @@ func testWrites(s *Store, keys []string, num int, wg *sync.WaitGroup) {
 func testReads(s *Store, keys []string, num int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	lenKeys := len(keys)
-	for i:=0;i<num;i++ {
-		key := keys[rand.Int() % lenKeys]
+	for i := 0; i < num; i++ {
+		key := keys[rand.Int()%lenKeys]
 		s.Get(key, key)
 	}
 }

@@ -1,14 +1,14 @@
 package mapstore
 
 import (
-	"sync"
 	"github.com/spaolacci/murmur3"
+	"sync"
 )
 
-const shards = 1024
+const defaultShardsCount = 1024
 
 type _shard struct {
-	data map[string]interface{}
+	data  map[string]interface{}
 	mutex sync.RWMutex
 }
 
@@ -19,20 +19,26 @@ func newShard() *_shard {
 }
 
 type Store struct {
-	shards []*_shard
+	shards      []*_shard
+	shardsCount int
 }
 
-func New() *Store {
+func NewWithSize(shardsCount int) *Store {
 	s := new(Store)
-	s.shards = make([]*_shard, shards)
-	for i:=0;i<shards;i++ {
+	s.shardsCount = shardsCount
+	s.shards = make([]*_shard, s.shardsCount)
+	for i := 0; i < shardsCount; i++ {
 		s.shards[i] = newShard()
 	}
 	return s
 }
 
+func New() *Store {
+	return NewWithSize(defaultShardsCount)
+}
+
 func (s *Store) getShard(key string) *_shard {
-	num := murmur3.Sum64([]byte(key)) % shards
+	num := int(murmur3.Sum64([]byte(key)) >> 1) % s.shardsCount
 	return s.shards[num]
 }
 
@@ -55,8 +61,8 @@ func (s *Store) Get(key string, defaultValue interface{}) (interface{}, bool) {
 }
 
 func (s *Store) ShardStats() []int {
-	result := make([]int, shards)
-	for i:=0;i<shards;i++ {
+	result := make([]int, s.shardsCount)
+	for i := 0; i < s.shardsCount; i++ {
 		shard := s.shards[i]
 		shard.mutex.RLock()
 		result[i] = len(shard.data)
