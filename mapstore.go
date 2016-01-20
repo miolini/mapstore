@@ -8,6 +8,8 @@ type Entry struct {
 type Store interface {
 	Set(string, interface{})
 	Get(string, interface{}) (interface{}, bool)
+	GetOrSet(string, interface{}) (interface{}, bool)
+	Delete(string) (bool)
 
 	Load(chan Entry)
 	Save(chan<- Entry)

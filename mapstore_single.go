@@ -33,6 +33,25 @@ func (s *StoreSingle) Set(key string, value interface{}) {
 	s.m.Unlock()
 }
 
+func (s *StoreSingle) GetOrSet(key string, defaultValue interface{}) (interface{}, bool) {
+	s.m.Lock()
+	value, ok := s.s[key]
+	if !ok {
+		s.s[key] = defaultValue
+		value = defaultValue
+	}
+	s.m.Unlock()
+	return value, ok
+}
+
+func (s *StoreSingle) Delete(key string) (bool) {
+	s.m.Lock()
+	_, ok := s.s[key]
+	delete(s.s, key)
+	s.m.Unlock()
+	return ok
+}
+
 func (s *StoreSingle) Load(entries chan Entry) {
 	for entry := range entries {
 		s.m.Lock()

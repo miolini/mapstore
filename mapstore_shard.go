@@ -57,6 +57,27 @@ func (s *StoreShard) Get(key string, defaultValue interface{}) (interface{}, boo
 	return value, true
 }
 
+func (s *StoreShard) GetOrSet(key string, defaultValue interface{}) (interface{}, bool) {
+	shard := s.getShard(key)
+	shard.m.Lock()
+	value, ok := shard.s[key]
+	if !ok {
+		shard.s[key] = defaultValue
+		value = defaultValue
+	}
+	shard.m.Unlock()
+	return value, ok
+}
+
+func (s *StoreShard) Delete(key string) (bool) {
+	shard := s.getShard(key)
+	shard.m.Lock()
+	_, ok := shard.s[key]
+	delete(shard.s, key)
+	shard.m.Unlock()
+	return ok
+}
+
 func (s *StoreShard) Set(key string, value interface{}) {
 	shard := s.getShard(key)
 	shard.m.Lock()
