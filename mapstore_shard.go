@@ -116,5 +116,10 @@ func (s *StoreShard) ShardStats() []int {
 }
 
 func (s *StoreShard) Len() int {
-	return 0
+	var len int
+	stats := s.ShardStats()
+	for _, shardLen := range stats {
+		len += shardLen
+	}
+	return len
 }

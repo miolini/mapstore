@@ -74,6 +74,7 @@ func (s *StoreSingle) ShardStats() []int {
 
 func (s *StoreSingle) Len() int {
 	s.m.RLock()
-	defer s.m.RUnlock()
-	return len(s.s)
+	storeLen := len(s.s)
+	s.m.RUnlock()
+	return storeLen
 }
