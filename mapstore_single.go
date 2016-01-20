@@ -44,7 +44,7 @@ func (s *StoreSingle) GetOrSet(key string, defaultValue interface{}) (interface{
 	return value, ok
 }
 
-func (s *StoreSingle) Delete(key string) (bool) {
+func (s *StoreSingle) Delete(key string) bool {
 	s.m.Lock()
 	_, ok := s.s[key]
 	delete(s.s, key)

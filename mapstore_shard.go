@@ -69,7 +69,7 @@ func (s *StoreShard) GetOrSet(key string, defaultValue interface{}) (interface{}
 	return value, ok
 }
 
-func (s *StoreShard) Delete(key string) (bool) {
+func (s *StoreShard) Delete(key string) bool {
 	shard := s.getShard(key)
 	shard.m.Lock()
 	_, ok := shard.s[key]
