@@ -44,6 +44,17 @@ func (s *StoreSingle) GetOrSet(key string, defaultValue interface{}) (interface{
 	return value, ok
 }
 
+func (s *StoreSingle) GetOrSetFunc(key string, newFn func() interface{}) (interface{}, bool) {
+	s.m.Lock()
+	value, ok := s.s[key]
+	if !ok {
+		value = newFn()
+		s.s[key] = value
+	}
+	s.m.Unlock()
+	return value, ok
+}
+
 func (s *StoreSingle) Delete(key string) bool {
 	s.m.Lock()
 	_, ok := s.s[key]
@@ -69,7 +80,7 @@ func (s *StoreSingle) Save(entries chan<- Entry) {
 }
 
 func (s *StoreSingle) ShardStats() []int {
-	return nil
+	return []int{s.Len()}
 }
 
 func (s *StoreSingle) Len() int {

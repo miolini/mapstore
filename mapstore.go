@@ -11,15 +11,13 @@ type Store interface {
 	Set(string, interface{})
 	Get(string, interface{}) (interface{}, bool)
 	GetOrSet(string, interface{}) (interface{}, bool)
+	GetOrSetFunc(string, func() interface{}) (interface{}, bool)
 	Delete(string) bool
 
 	Load(chan Entry)
 	Save(chan<- Entry)
 
-	//for single map
 	Len() int
-
-	//for sharded map
 	ShardStats() []int
 }
 

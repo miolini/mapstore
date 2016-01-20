@@ -69,6 +69,18 @@ func (s *StoreShard) GetOrSet(key string, defaultValue interface{}) (interface{}
 	return value, ok
 }
 
+func (s *StoreShard) GetOrSetFunc(key string, newFn func() interface{}) (interface{}, bool) {
+	shard := s.getShard(key)
+	shard.m.Lock()
+	value, ok := shard.s[key]
+	if !ok {
+		value = newFn()
+		shard.s[key] = value
+	}
+	shard.m.Unlock()
+	return value, ok
+}
+
 func (s *StoreShard) Delete(key string) bool {
 	shard := s.getShard(key)
 	shard.m.Lock()
