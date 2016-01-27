@@ -41,7 +41,7 @@ func newStoreShard(shardsCount int) *StoreShard {
 func (s *StoreShard) getShard(key string) *shard {
 	s.m.RLock()
 	defer s.m.RUnlock()
-	num := int(murmur3.Sum64([]byte(key)) >> 1) % s.shardsCount
+	num := int(murmur3.Sum64([]byte(key))>>1) % s.shardsCount
 	return s.shards[num]
 }
 
@@ -106,7 +106,7 @@ func (s *StoreShard) Load(entries chan Entry) {
 	}
 }
 
-func (s *StoreShard) Save(entries chan <- Entry) {
+func (s *StoreShard) Save(entries chan<- Entry) {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	for _, shard := range s.shards {

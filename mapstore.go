@@ -17,7 +17,7 @@ type Store interface {
 	UpdateIfExists(string, func(interface{}) interface{}) bool
 
 	Load(chan Entry)
-	Save(chan <- Entry)
+	Save(chan<- Entry)
 
 	Len() int
 	ShardStats() []int

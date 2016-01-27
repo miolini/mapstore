@@ -71,7 +71,7 @@ func (s *StoreSingle) Load(entries chan Entry) {
 	}
 }
 
-func (s *StoreSingle) Save(entries chan <- Entry) {
+func (s *StoreSingle) Save(entries chan<- Entry) {
 	s.m.RLock()
 	defer s.m.Unlock()
 	for k, v := range s.s {
