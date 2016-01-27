@@ -71,7 +71,7 @@ func (s *StoreSingle) Load(entries chan Entry) {
 	}
 }
 
-func (s *StoreSingle) Save(entries chan<- Entry) {
+func (s *StoreSingle) Save(entries chan <- Entry) {
 	s.m.RLock()
 	defer s.m.Unlock()
 	for k, v := range s.s {
@@ -88,4 +88,23 @@ func (s *StoreSingle) Len() int {
 	storeLen := len(s.s)
 	s.m.RUnlock()
 	return storeLen
+}
+
+func (s *StoreSingle) Update(key string, fn func(interface{}) interface{}) bool {
+	s.m.Lock()
+	defer s.m.Unlock()
+	v, ok := s.s[key]
+	s.s[key] = fn(v)
+	return ok
+}
+
+func (s *StoreSingle) UpdateIfExists(key string, fn func(interface{}) interface{}) bool {
+	s.m.Lock()
+	defer s.m.Unlock()
+	v, ok := s.s[key]
+	if !ok {
+		return false
+	}
+	s.s[key] = fn(v)
+	return ok
 }

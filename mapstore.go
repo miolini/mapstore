@@ -13,9 +13,11 @@ type Store interface {
 	GetOrSet(string, interface{}) (interface{}, bool)
 	GetOrSetFunc(string, func() interface{}) (interface{}, bool)
 	Delete(string) bool
+	Update(string, func(interface{}) interface{}) bool
+	UpdateIfExists(string, func(interface{}) interface{}) bool
 
 	Load(chan Entry)
-	Save(chan<- Entry)
+	Save(chan <- Entry)
 
 	Len() int
 	ShardStats() []int

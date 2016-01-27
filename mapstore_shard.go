@@ -41,7 +41,7 @@ func newStoreShard(shardsCount int) *StoreShard {
 func (s *StoreShard) getShard(key string) *shard {
 	s.m.RLock()
 	defer s.m.RUnlock()
-	num := int(murmur3.Sum64([]byte(key))>>1) % s.shardsCount
+	num := int(murmur3.Sum64([]byte(key)) >> 1) % s.shardsCount
 	return s.shards[num]
 }
 
@@ -106,7 +106,7 @@ func (s *StoreShard) Load(entries chan Entry) {
 	}
 }
 
-func (s *StoreShard) Save(entries chan<- Entry) {
+func (s *StoreShard) Save(entries chan <- Entry) {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	for _, shard := range s.shards {
@@ -134,4 +134,25 @@ func (s *StoreShard) Len() int {
 		len += shardLen
 	}
 	return len
+}
+
+func (s *StoreShard) Update(key string, f func(v interface{}) interface{}) bool {
+	shard := s.getShard(key)
+	shard.m.Lock()
+	defer shard.m.Unlock()
+	v, ok := shard.s[key]
+	shard.s[key] = f(v)
+	return ok
+}
+
+func (s *StoreShard) UpdateIfExists(key string, f func(v interface{}) interface{}) bool {
+	shard := s.getShard(key)
+	shard.m.Lock()
+	defer shard.m.Unlock()
+	v, ok := shard.s[key]
+	if !ok {
+		return false
+	}
+	shard.s[key] = f(v)
+	return ok
 }
